@@ -2,4 +2,4 @@ import pygame
 
 pygame.init()
 
-win = pygame.diplay.set_mode((600,600))
+win = pygame.display.set_mode((600,600))
