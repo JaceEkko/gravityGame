@@ -18,7 +18,7 @@ class player(object):
         self.y=y
         self.width=width
         self.height=height
-        self.vel=5
+        self.vel=8
         self.isJump=False
         self.jumpCount = 10
 
@@ -27,8 +27,9 @@ class asteroid(object):
         self.x=x
         self.y=y
         self.radius=radius
-        self.force=0
-        self.forceAdd=1
+        self.force=3
+        self.forceAdd=0.05
+        self.forceCap=10
 
     def draw(self, win):
         win.blit(ast1, (self.x - self.radius/2, self.y- self.radius/2))#pygame.draw.circle(win, (0,255,0), (self.x, self.y), int(round(self.radius/2)))
@@ -51,7 +52,7 @@ ay = 200
 
 #Main Loop
 man = player(200,410,64,64)
-asterLst = [asteroid(300,200,160), asteroid(800,200,160), asteroid(450,500,160)]
+asterLst = [asteroid(300,200,200), asteroid(800,200,200), asteroid(450,500,160)]
 
 def reDrawGameWindow():
     win.blit(bg, (0,0))#win.fill((0,0,255))
@@ -97,20 +98,23 @@ while run:
     for a in asterLst:
         a.draw(win)
         if inRange(man.x, man.y, a.x, a.y, a.radius):
-            a.force += 0.03
-        else:
-            if a.force > 0:
-                a.force -= 0.03
-            
-        if man.x < a.x:
-            man.x += a.force
-        elif man.x > a.x:
-            man.x -= a.force
-        if man.y < a.y:
-            man.y += a.force
-        elif man.y > a.y:
-            man.y -= a.force
+            #a.force += a.forceAdd
 
+        #if man.x < a.x:
+            #man.x += a.forceAdd
+        #elif man.x > a.x:
+            #man.x -= a.forceAdd
+         if man.y < a.y:
+            a.force += 0.03
+            man.y += a.force
+         elif man.y > a.y:
+            a.force -= 0.03
+            man.y -= a.force
+         #else:
+            #if a.force > 0:
+                #a.force -= a.forceAdd
+            
+        
     reDrawGameWindow()
     pygame.display.update()
     
