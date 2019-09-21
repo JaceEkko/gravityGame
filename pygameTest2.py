@@ -51,14 +51,13 @@ ay = 200
 
 #Main Loop
 man = player(200,410,64,64)
-aster = asteroid(300,200,160)
-aster2 = asteroid(450,200,160)
-aster3 = asteroid(450,300,160)
+asterLst = [asteroid(300,200,160), asteroid(800,200,160), asteroid(450,500,160)]
 
 def reDrawGameWindow():
     win.blit(bg, (0,0))#win.fill((0,0,255))
     pygame.draw.rect(win, (255,0,0), (man.x,man.y,man.width,man.height))#draws a rectangle in the window, you can also draw circles, etc.
-    aster.draw(win)
+    for a in asterLst:
+        a.draw(win)#aster.draw(win)
     pygame.display.update()
 
 run = True
@@ -95,20 +94,22 @@ while run:
             man.jumpCount = 10
 
     #gravity
-    if inRange(man.x, man.y, aster.x, aster.y, aster.radius):
-        aster.force += 0.03
-    else:
-        if aster.force > 0:
-            aster.force -= 0.03
-        
-    if man.x < aster.x:
-        man.x += aster.force
-    elif man.x > aster.x:
-        man.x -= aster.force
-    if man.y < aster.y:
-        man.y += aster.force
-    elif man.y > aster.y:
-        man.y -= aster.force
+    for a in asterLst:
+        a.draw(win)
+        if inRange(man.x, man.y, a.x, a.y, a.radius):
+            a.force += 0.03
+        else:
+            if a.force > 0:
+                a.force -= 0.03
+            
+        if man.x < a.x:
+            man.x += a.force
+        elif man.x > a.x:
+            man.x -= a.force
+        if man.y < a.y:
+            man.y += a.force
+        elif man.y > a.y:
+            man.y -= a.force
 
     reDrawGameWindow()
     pygame.display.update()
