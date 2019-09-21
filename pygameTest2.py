@@ -18,18 +18,19 @@ class player(object):
         self.y=y
         self.width=width
         self.height=height
-        self.vel=8
+        self.velX=0
+        self.velY=0
         self.isJump=False
         self.jumpCount = 10
 
 class asteroid(object):
-    def __init__(self, x, y, radius):
+    def __init__(self, x, y, radius, forceCap):
         self.x=x
         self.y=y
         self.radius=radius
-        self.force=3
-        self.forceAdd=0.05
-        self.forceCap=10
+        self.force=0
+        self.forceAdd=(forceCap/10)
+        self.forceCap=forceCap
 
     def draw(self, win):
         win.blit(ast1, (self.x - self.radius/2, self.y- self.radius/2))#pygame.draw.circle(win, (0,255,0), (self.x, self.y), int(round(self.radius/2)))
@@ -51,8 +52,8 @@ ax = 200
 ay = 200
 
 #Main Loop
-man = player(200,410,64,64)
-asterLst = [asteroid(300,200,200), asteroid(800,200,200), asteroid(450,500,160)]
+man = player(10,10,64,64)
+asterLst = [asteroid(400,400,200, 10), asteroid(800,400,200, 20)]
 
 def reDrawGameWindow():
     win.blit(bg, (0,0))#win.fill((0,0,255))
@@ -64,55 +65,60 @@ def reDrawGameWindow():
 run = True
 while run:
     pygame.time.delay(5)#include a delay to make things not run too fast
-    
+
+    mCoords = pygame.mouse.get_pos()
+
+    man.x += man.velX
+    man.y += man.velY
     for event in pygame.event.get():#this loop knows all the events that could happen in pygame
         if event.type == pygame.QUIT: #you hit the close button, end game
             run = False
 
-    keys = pygame.key.get_pressed()#this is a list of all the keys
-    if keys[pygame.K_LEFT] and man.x > 0:
-        man.x -= man.vel
-    if keys[pygame.K_RIGHT] and man.x < sWidth - man.width:
-        man.x += man.vel
+        if event.type == pygame.MOUSEBUTTONUP:
+            man.velX = (mCoords[0] - man.x)/100
+            man.velY = (mCoords[1] - man.y)/100
 
-    if not(man.isJump):
-        if keys[pygame.K_UP] and man.y > 0:
-            man.y -= man.vel
-        if keys[pygame.K_DOWN] and man.y < sHeight - man.height:
-            man.y += man.vel
-        if keys[pygame.K_SPACE]:
-            man.isJump=True
-    else:
-        if man.jumpCount >= -10:
-            neg = 1
-            if man.jumpCount < 0:
-                neg = -1
-            man.y -= (man.jumpCount ** 2) * 0.5 * neg
-            man.jumpCount -= 1
+        
+    #print(pygame.mouse.get_pos())
+      
 
-        else:
-            man.isJump = False
-            man.jumpCount = 10
-
+##    keys = pygame.key.get_pressed()#this is a list of all the keys
+##    if keys[pygame.K_LEFT] and man.x > 0:
+##        man.x -= man.vel
+##    if keys[pygame.K_RIGHT] and man.x < sWidth - man.width:
+##        man.x += man.vel
+    
+##    if keys[pygame.K_UP] and man.y > 0:
+##        man.y -= man.vel + a.force
+##    if keys[pygame.K_DOWN] and man.y < sHeight - man.height:
+##        man.y += man.vel + a.force
+##    if keys[pygame.K_SPACE]:
+##        man.isJump=True
+    
     #gravity
     for a in asterLst:
+        man.y += a.force
+        man.x += a.force
         a.draw(win)
         if inRange(man.x, man.y, a.x, a.y, a.radius):
-            #a.force += a.forceAdd
-
-        #if man.x < a.x:
-            #man.x += a.forceAdd
-        #elif man.x > a.x:
-            #man.x -= a.forceAdd
-         if man.y < a.y:
-            a.force += 0.03
-            man.y += a.force
-         elif man.y > a.y:
-            a.force -= 0.03
-            man.y -= a.force
+            if man.y < a.y and a.force < a.forceCap:
+                a.force += a.forceAdd
+            elif man.y > a.y and a.force > -a.forceCap:
+                a.force -= a.forceAdd
+            if man.x < a.x and a.force < a.forceCap:
+                a.force += a.forceAdd
+            elif man.x > a.x and a.force > -a.forceCap:
+                a.force -= a.forceAdd
          #else:
             #if a.force > 0:
                 #a.force -= a.forceAdd
+
+##    if keys[pygame.K_UP] and man.y > 0:
+##        man.y -= man.vel + a.force
+##    if keys[pygame.K_DOWN] and man.y < sHeight - man.height:
+##        man.y += man.vel + a.force
+##    if keys[pygame.K_SPACE]:
+##        man.isJump=True
             
         
     reDrawGameWindow()
