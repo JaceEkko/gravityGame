@@ -3,11 +3,14 @@
 import pygame
 pygame.init()
 
-sWidth = 600
-sHeight = 600
+sWidth = 1280
+sHeight = 720
 win=pygame.display.set_mode((sWidth, sHeight))
 
 pygame.display.set_caption("First Game")
+
+bg = pygame.image.load('bg1.jpg')
+ast1 = pygame.image.load('a1.png')
 
 class player(object):
     def __init__(self,x,y,width,height):
@@ -15,7 +18,7 @@ class player(object):
         self.y=y
         self.width=width
         self.height=height
-        self.vel=3
+        self.vel=5
         self.isJump=False
         self.jumpCount = 10
 
@@ -28,16 +31,16 @@ class asteroid(object):
         self.forceAdd=1
 
     def draw(self, win):
-        pygame.draw.circle(win, (0,255,0), (self.x, self.y), int(round(self.radius/2)))
+        win.blit(ast1, (self.x - self.radius/2, self.y- self.radius/2))#pygame.draw.circle(win, (0,255,0), (self.x, self.y), int(round(self.radius/2)))
         pygame.draw.circle(win, (0,255,255), (self.x, self.y), self.radius, 1)
 
 def inRange(xP, yP, xA, yA, gRange):
     xB = False
     yB = False
     within = False
-    if(xP >= xA - gRange and xP <= xA + gRange):
+    if(xP > xA - gRange and xP < xA + gRange):
         xB = True
-    if(yP >= yA - gRange and yP <= yA + gRange):
+    if(yP > yA - gRange and yP < yA + gRange):
         yB = True
     if xB and yB:
         within = True
@@ -48,17 +51,19 @@ ay = 200
 
 #Main Loop
 man = player(200,410,64,64)
-aster = asteroid(300,200,120)
+aster = asteroid(300,200,160)
+aster2 = asteroid(450,200,160)
+aster3 = asteroid(450,300,160)
 
 def reDrawGameWindow():
-    win.fill((0,0,255))
+    win.blit(bg, (0,0))#win.fill((0,0,255))
     pygame.draw.rect(win, (255,0,0), (man.x,man.y,man.width,man.height))#draws a rectangle in the window, you can also draw circles, etc.
     aster.draw(win)
     pygame.display.update()
 
 run = True
 while run:
-    pygame.time.delay(10)#include a delay to make things not run too fast
+    pygame.time.delay(5)#include a delay to make things not run too fast
     
     for event in pygame.event.get():#this loop knows all the events that could happen in pygame
         if event.type == pygame.QUIT: #you hit the close button, end game
@@ -91,10 +96,10 @@ while run:
 
     #gravity
     if inRange(man.x, man.y, aster.x, aster.y, aster.radius):
-        aster.force += 0.01
+        aster.force += 0.03
     else:
         if aster.force > 0:
-            aster.force -= 0.01
+            aster.force -= 0.03
         
     if man.x < aster.x:
         man.x += aster.force
